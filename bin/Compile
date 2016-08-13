@@ -1,4 +1,4 @@
-#!/bin/bash
+/bin/bash
 
 # Welcome back to Hacklandia.
 
@@ -531,6 +531,8 @@ function handle_meta_recipe() {
    [ -n "$symlink" ] && compileoptions="$compileoptions --symlink=${symlink}"
 
    started=no
+   metaRecipeContents=$target/Resources/MetaRecipe
+   Quiet mkdir -p ${metaRecipeContents%/*}
    export compileMetaRecipe=1
    for item in "${include[@]}"
    do
@@ -548,8 +550,10 @@ function handle_meta_recipe() {
       in_host $0 $compileoptions --no-dependencies --keep --app-name "$appname" --version-number "$versionnumber" ${userconfigureoptions:+--configure-options="${userconfigureoptions[@]}"} "$iname" "$iversion"
       if [ "$?" -gt 0 ]
       then
+         echo "$iname $iversion [Failed]" >> $metaRecipeContents
          Die "Compilation of $iname $iversion failed."
       fi
+      echo "$iname $iversion [Installed]" >> $metaRecipeContents
    done
    Boolean "no-build" && exit 0
    install_extras
